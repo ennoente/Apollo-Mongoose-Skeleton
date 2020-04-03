@@ -1,5 +1,5 @@
 import {ApolloServer, gql} from 'apollo-server';
-import {Resolvers, TypeDefs} from '../resources';
+import {Resolvers, TypeDefs} from './resources';
 import Mongoose from 'mongoose';
 
 const server = new ApolloServer({
