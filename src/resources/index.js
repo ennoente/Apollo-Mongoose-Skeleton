@@ -1,29 +1,23 @@
 import _ from 'lodash';
 
 import { QueryTypeDefs, QueryResolvers } from "./Query";
+import {SysMachineTypeDefs} from "./sysMachine";
+import {SysGroupTypeDefs} from "./sysGroup";
+import {SysManufacturerTypeDefs} from "./sysManufacturer";
+import {MutationTypeDefs} from "./Mutation";
+import {UserResolvers, UserTypeDefs} from "./user";
 
-/**
- * Example code:
- * import _ from 'lodash';
- * import { RootQueryTypeDefs,   RootQueryResolvers }    from './rootQuery';
- * import { SysMachineTypeDefs,  SysMachineResolvers }  from "./sysMachine";
- *
- *
- * export const Resolvers = _.merge(
- * RootQueryResolvers,
- * SysMachineResolvers
- * );
- *
- * export const TypeDefs = [
- * RootQueryTypeDefs,
- * SysMachineTypeDefs
- * ];
- */
 
 export const Resolvers = _.merge(
-  QueryResolvers
+  QueryResolvers,
+  UserResolvers
 );
 
 export const TypeDefs = [
-  QueryTypeDefs
+  MutationTypeDefs,
+  QueryTypeDefs,
+  SysMachineTypeDefs,
+  SysGroupTypeDefs,
+  SysManufacturerTypeDefs,
+  UserTypeDefs
 ];
