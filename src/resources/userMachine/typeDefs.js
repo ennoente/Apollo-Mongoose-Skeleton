@@ -1,29 +1,29 @@
-import {gql} from 'apollo-server';
+import { gql } from "apollo-server";
 
-export default gql`
-  scalar ISODate
-  
+export default gql `
   type UserMachine {
-      description: String
-      barcode: String
-      buildYear: ISODate
-      serialNumber: String
-      active: Boolean
+    _id: ID
 
-      #room: Int
-      sysMachine: SysMachine!
-      user: User!
+    description: String
+    barcode: String
+    buildYear: Int
+    serialNumber: String
+    active: Boolean
+
+    room: UserRoom
+    sysMachine: SysMachine!
+    user: User!
   }
-  
-  input UserMachineInput {
-      description: String
-      barcode: String
-      buildYear: ISODate
-      serialNumber: String
-      active: Boolean
 
-      roomId: Int
-      sysMachineId: Int!
-      userId: Int!
+  input UserMachineInput {
+    description: String
+    barcode: String
+    buildYear: Int
+    serialNumber: String
+    active: Boolean
+
+    roomId: String!
+    sysMachineId: String!
+    userId: String!
   }
 `;

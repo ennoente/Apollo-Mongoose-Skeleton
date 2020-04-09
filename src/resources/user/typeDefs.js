@@ -1,10 +1,11 @@
-import { gql } from 'apollo-server';
+import { gql } from "apollo-server";
 
-export default gql`
+export default gql `
   type User {
-      _id: ID
-      email: String
-      
-      
+    _id: ID
+    email: String
+
+    machines: [UserMachine]
+    rooms: [UserRoom]
   }
 `;
