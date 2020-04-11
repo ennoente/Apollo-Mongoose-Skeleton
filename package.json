@@ -1,37 +1,38 @@
 {
-  "name": "brabo",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "babel-watch -L .",
-    "babel-version": "babel --version"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@graphback/runtime-mongo": "^0.11.4",
-    "apollo-server": "^2.11.0",
-    "bcrypt": "^4.0.1",
-    "dataloader": "^2.0.0",
-    "graphql": "^14.6.0",
-    "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
-    "mongoose": "^5.9.7"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/polyfill": "^7.8.7",
-    "@babel/preset-env": "^7.9.0",
-    "@playlyfe/gql": "^2.6.2",
-    "babel-plugin-inline-dotenv": "^1.5.0",
-    "babel-plugin-inline-import": "^3.0.0",
-    "babel-plugin-module-resolver": "^4.0.0",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-    "babel-watch": "^7.0.0"
-  }
+    "name": "brabo",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "babel-watch -L .",
+        "babel-version": "babel --version"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@graphback/runtime-mongo": "^0.11.4",
+        "apollo-server": "^2.11.0",
+        "bcrypt": "^4.0.1",
+        "dataloader": "^2.0.0",
+        "graphql": "^14.6.0",
+        "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.15",
+        "mongodb": "^3.5.5",
+        "mongoose": "^5.9.7"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.8.4",
+        "@babel/core": "^7.9.0",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/polyfill": "^7.8.7",
+        "@babel/preset-env": "^7.9.0",
+        "@playlyfe/gql": "^2.6.2",
+        "babel-plugin-inline-dotenv": "^1.5.0",
+        "babel-plugin-inline-import": "^3.0.0",
+        "babel-plugin-module-resolver": "^4.0.0",
+        "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+        "babel-watch": "^7.0.0"
+    }
 }

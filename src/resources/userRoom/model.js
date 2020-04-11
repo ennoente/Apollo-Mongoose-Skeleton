@@ -7,6 +7,12 @@ const schema = new Mongoose.Schema({
     },
     description: String,
 
+    machineIds: [{
+        type: Mongoose.Types.ObjectId,
+        ref: 'UserMachine',
+        inversedBy: 'roomId'
+    }],
+
     updatedBy: {
         type: String,
         required: true

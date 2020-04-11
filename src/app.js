@@ -1,6 +1,6 @@
 import Mongoose from 'mongoose';
 import DataLoader from "dataloader";
-import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServer, gql, makeExecutableSchema } from 'apollo-server';
 import jwtLib from 'jsonwebtoken';
 
 import { Resolvers, TypeDefs } from './resources';
@@ -13,9 +13,13 @@ import { userRoomBatchingFunc } from "./resources/userRoom/data";
 
 import { UserModel } from "./resources/user/model";
 
-const server = new ApolloServer({
+const schema = makeExecutableSchema({
     typeDefs: TypeDefs,
-    resolvers: Resolvers,
+    resolvers: Resolvers
+});
+
+const server = new ApolloServer({
+    schema,
     context: async({ req }) => {
         const authHeader = req.get('Authorization');
         let token = null;

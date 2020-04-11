@@ -1,6 +1,7 @@
 import { UserMachineModel } from "./model";
 import { UserRoomModel } from "../userRoom/model";
 import { SysMachineModel } from "../sysMachine/model";
+import Mongoose from "mongoose";
 
 /*
 export const fetchUserMachinesByUserId = async userId => {
@@ -28,16 +29,44 @@ export const createUserMachine = async(ctx, input) => {
     const userMachine = new UserMachineModel({
         ...input,
     });
-    await userMachine.save((err, machine) => {
-        if (err) throw err;
 
-        console.log("new machihne:", machine);
+    const fields = UserMachineModel.schema.obj;
 
-        return transform(machine, sysMachineLoader);
-    });
+    for (let key in fields) {
+        // Field has a reference to another document
+        //if (fields[key]["ref"]) {
+        if (key === 'userId') {
+            const referencedModelName = fields[key]["ref"];
+            console.log(`Field ${key} has ref named ${referencedModelName}`);
 
-    // Find corresponding UserRoom and sysMachine
-    //const room =
+            const ReferencedModel = Mongoose.model(referencedModelName);
+            const inputField = input[key];
+            console.log("fields[key].inversedBy", fields[key]["inversedBy"]);
+            console.log("fields[key].inversedIn", fields[key]["inversedIn"]);
+
+            if (inputField) {
+                const referencedDocument = await ReferencedModel.findById(input[key]);
+                console.log("referencedDocument", referencedDocument);
+
+                if (fields[key]['inversedBy']) {
+                    referencedDocument[fields[key]['inversedBy']] = input[key];
+                    console.log(referencedDocument);
+                } else if (fields[key]['inversedIn']) {
+                    const name = fields[key]['inversedIn'];
+                    console.log(`Adding to field ${name}`);
+                    referencedDocument[name].push(input[key]);
+                    //referencedDocument[fields[key]['inversedIn']].push(input[key]);
+                    console.log(referencedDocument);
+                }
+            }
+        }
+    }
+
+    //const savedMachine = await userMachine.save((err) => {
+    //    if (err) throw err;
+    //});
+
+    //return transform(savedMachine, sysMachineLoader);
 };
 
 export const userMachineBatchingFunc = async(ids) => {
@@ -53,7 +82,7 @@ export const userMachineBatchingFunc = async(ids) => {
 const transform = (obj, sysMachineLoader) => {
     return {
         ...obj._doc,
-        sysMachine: sysMachineLoader.load(obj.sysMachineId),
+        sysMachine: () => sysMachineLoader.load(obj.sysMachineId),
         //user:
     };
 };

@@ -9,7 +9,8 @@ const userMachineSchema = new Mongoose.Schema({
 
     roomId: {
         type: Mongoose.ObjectId,
-        ref: 'UserRoom'
+        ref: 'UserRoom',
+        inversedIn: 'machineIds'
     },
     sysMachineId: {
         type: Mongoose.ObjectId,
@@ -17,7 +18,8 @@ const userMachineSchema = new Mongoose.Schema({
     },
     userId: {
         type: Mongoose.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        inversedIn: 'machineIds'
     },
 
     //sysEdit: String,

@@ -13,9 +13,6 @@ export const fetchUserByJWT = async(jwt, { userMachineLoader, userRoomLoader }) 
         _id: userId
     });
 
-    console.log(userMachineLoader);
-    console.log(userRoomLoader);
-
     if (!user) return null;
     return transform(user, userMachineLoader, userRoomLoader);
 };

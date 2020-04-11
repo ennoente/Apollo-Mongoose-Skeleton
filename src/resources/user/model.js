@@ -18,9 +18,10 @@ const userSchema = new Mongoose.Schema({
         type: String
     }],
 
-    machines: [{
+    machineIds: [{
         type: Mongoose.ObjectId,
-        ref: 'UserMachines'
+        ref: 'UserMachines',
+        inversedBy: 'userId'
     }],
     rooms: [{
         type: Mongoose.ObjectId,
