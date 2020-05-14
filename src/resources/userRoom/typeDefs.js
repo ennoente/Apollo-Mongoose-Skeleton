@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 export default gql `
     type UserRoom {
-        _id: ID
+        id: ID
         name: String!
         description: String
     }
@@ -10,6 +10,6 @@ export default gql `
     input CreateUserRoomInput {
         name: String!
         description: String
-        userId: String!
+        userId: Int!
     }
 `;

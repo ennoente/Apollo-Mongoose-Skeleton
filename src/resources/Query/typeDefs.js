@@ -3,9 +3,11 @@ import { gql } from 'apollo-server';
 export default gql `
   type Query {
       hello: String!
-      allSysMachines: [SysMachine]
+
+      sysMachine(id: String!): SysMachine
+      allSysMachines(manufacturer: String, group: String): [SysMachine]
       
-      login(email: String!, password: String!): String
+      login(username: String!, password: String!): String
 
       me: User
   }

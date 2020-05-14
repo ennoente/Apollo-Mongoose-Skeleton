@@ -1,8 +1,8 @@
-import {gql} from 'apollo-server';
+import { gql } from 'apollo-server';
 
-export default gql`
+export default gql `
   type SysMachine {
-      _id: ID
+      id: ID
       name: String
       description: String
       sysEdit: String

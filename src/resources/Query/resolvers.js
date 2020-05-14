@@ -1,20 +1,25 @@
-import { fetchAllSysMachines } from "../sysMachine/data";
-import { login, fetchUserByJWT } from "../user/data";
+import { login } from "../user/data";
+
+import { genericQueryResolver } from "../util";
 
 export default {
     Query: {
-        hello: async() => 'Hello World :)',
-        allSysMachines: async(parent, args, ctx) => {
-            return await fetchAllSysMachines(ctx.sysGroupLoader, ctx.sysManufacturerLoader);
-        },
+        hello: () => "Hello World :)",
+
+        sysMachine: genericQueryResolver,
+        allSysMachines: genericQueryResolver,
 
         login: async(parent, args) => {
             return await login(args);
         },
 
+        me: genericQueryResolver,
+
+        /*
         me: async(parent, args, ctx) => {
             const { jwt, userMachineLoader } = ctx;
             return await fetchUserByJWT(jwt, ctx);
-        }
-    }
-}
+        },
+        */
+    },
+};

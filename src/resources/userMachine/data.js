@@ -1,88 +1,148 @@
-import { UserMachineModel } from "./model";
-import { UserRoomModel } from "../userRoom/model";
-import { SysMachineModel } from "../sysMachine/model";
-import Mongoose from "mongoose";
+import knex from '../../knex';
+import {getSQLTable} from '../../joinMasterUtil';
+import idx from 'idx';
+import SqlString from 'sqlstring';
+import {ForbiddenError} from 'apollo-server';
+import { GraphQLSchema } from "../../app";
+import assert from 'assert';
 
 /*
-export const fetchUserMachinesByUserId = async userId => {
-    const userMachines = await UserMachineModel.find({
-        userId: userId
-    });
+const getSqlTableFromReferencedField = (authObj, mutationName, inputField) => {
+    console.log("inputField", inputField);
 
+    const referencedType = authObj[inputField].refType;
+    const sqlTable = idx(GraphQLSchema, _ => _._typeMap[referencedType]._typeConfig.sqlTable);
 
+    assert(sqlTable, 'No sqlTable found!');
+
+    return sqlTable;
 };
-*/
+ */
 
-export const createUserMachine = async(ctx, input) => {
-    const { roomId, sysMachineId, userId } = input;
-    const { user, sysMachineLoader } = ctx;
+/**
+ *
+ * 1. All credentialsMatch functions must return true
+ * 2. The combined SQL for sqlRowExists functions must return 1 on all resulting rows
+ *
+ * @param args The user's input
+ * @param context The context provided for all resolvers (contains JWT)
+ */
+/*
+const authorize = async (authorizationFunc, args, context) => {
+    const authObj = authorizationFunc(args, context);
+    const {input} = args;
 
-    // Check permissions
-    const sysMachine = await SysMachineModel.findById(sysMachineId);
+    //const sqlExistArr = [];
+    const sqlSelections = [];
 
-    // User has to have permission to room and user
-    if (userId !== user.id || !user.rooms.includes(roomId))
-        return new Error("You do not have permission to create this machine");
-    // SysMachine has to exist
-    if (!sysMachine) return new Error("Invalid sys machine");
+    // 1. Iterate through input and call all credentialsMatch functions
+    // Simultaneously build SQL command from the sqlRowExists functions
+    for (let inputField in input) {
+        const authField = authObj[inputField];
+        const {credentialsMatch, sqlRowExists} = authField;
 
-    const userMachine = new UserMachineModel({
-        ...input,
-    });
+        if (credentialsMatch) {
+            console.log(`credentialsMatch function exists for key ${inputField}`);
+            const [success, errorMessage] = credentialsMatch();
 
-    const fields = UserMachineModel.schema.obj;
-
-    for (let key in fields) {
-        // Field has a reference to another document
-        //if (fields[key]["ref"]) {
-        if (key === 'userId') {
-            const referencedModelName = fields[key]["ref"];
-            console.log(`Field ${key} has ref named ${referencedModelName}`);
-
-            const ReferencedModel = Mongoose.model(referencedModelName);
-            const inputField = input[key];
-            console.log("fields[key].inversedBy", fields[key]["inversedBy"]);
-            console.log("fields[key].inversedIn", fields[key]["inversedIn"]);
-
-            if (inputField) {
-                const referencedDocument = await ReferencedModel.findById(input[key]);
-                console.log("referencedDocument", referencedDocument);
-
-                if (fields[key]['inversedBy']) {
-                    referencedDocument[fields[key]['inversedBy']] = input[key];
-                    console.log(referencedDocument);
-                } else if (fields[key]['inversedIn']) {
-                    const name = fields[key]['inversedIn'];
-                    console.log(`Adding to field ${name}`);
-                    referencedDocument[name].push(input[key]);
-                    //referencedDocument[fields[key]['inversedIn']].push(input[key]);
-                    console.log(referencedDocument);
-                }
+            if (!success) {
+                throw new ForbiddenError(errorMessage);
             }
         }
+
+        // Add to sqlExistArr
+        if (sqlRowExists) {
+            console.log(`sqlRowExists exists for key ${inputField}`);
+            const sqlTable = getSqlTableFromReferencedField(authObj, 'createUserMachine', inputField);
+            const [sqlCommand, errorMessage] = sqlRowExists(sqlTable);
+
+            sqlSelections.push({
+                sqlCommand: sqlCommand,
+                sqlTable: sqlTable,
+                errorMessage: errorMessage
+            });
+        }
+
     }
 
-    //const savedMachine = await userMachine.save((err) => {
-    //    if (err) throw err;
-    //});
+    // If no SQL checks have to be made, just continue
+    if (sqlSelections.length === 0)
+        return;
 
-    //return transform(savedMachine, sysMachineLoader);
+    let rawSelectCommand = '';
+    let bindings = [];
+
+    // 2. Iterate through sqlSelections and build SQL
+    sqlSelections.forEach((sqlSelection, index) => {
+        const { sqlTable, sqlCommand } = sqlSelection;
+
+        if (index === 0)
+            rawSelectCommand += 'SELECT EXISTS ? AS present';
+        else
+            rawSelectCommand += ' UNION ALL SELECT EXISTS ?';
+
+        bindings.push(
+            knex(sqlTable)
+                .select('id')
+                .whereRaw(sqlCommand)
+        )
+    });
+
+
+    // Fetch results via knex
+    const [ results ] = await knex.raw(
+        rawSelectCommand,
+        bindings
+    );
+
+
+    // Iterate over results and throw appropriate error message when a `present` value is 0
+    results.forEach(({ present }, index) => {
+        if (present === 0)
+            throw new ForbiddenError(sqlSelections[index].errorMessage);
+    });
 };
+ */
 
-export const userMachineBatchingFunc = async(ids) => {
-    try {
-        return await UserMachineModel.find({
-            _id: { $in: ids },
+
+export const createUserMachine = async (parent, args, ctx, info) => {
+    const userMachineTable = getSQLTable('UserMachine');
+    const sysMachineTable = getSQLTable('SysMachine');
+    const {userId} = ctx.jwt;
+    const {sysMachineId, roomId} = args.input;
+
+    //const authorizationFunc = ctx.schema._typeMap.Mutation._fields.createUserMachine.authorization;
+
+    //const authorizationFunc = idx(ctx, _ => _.schema._typeMap.Mutation._fields.createUserMachine.authorization); // TODO Make generic
+    const authorizationFunc = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields.createUserMachine.authorization); // TODO Make generic
+
+
+    if (authorizationFunc) {
+        console.log("Calling authorize()");
+        await authorize(authorizationFunc, args, ctx);
+    }
+
+    const authObj = authorizationFunc(args, ctx);
+
+    console.log("authObj", authObj);
+
+
+    const [newUserMachine] = await knex(userMachineTable)
+        .insert({
+            //...input,
+            sys_machine_id: sysMachineId,
+            user_room_id: roomId,
+            sys_user_id: userId
         });
-    } catch (e) {
-        throw e;
-    }
-};
 
-const transform = (obj, sysMachineLoader) => {
-    return {
-        ...obj._doc,
-        sysMachine: () => sysMachineLoader.load(obj.sysMachineId),
-        //user:
-    };
-};
+    //const result = await knex.raw(
+    //    `SELECT * FROM `
+    //)
+
+    //const result = await knex(userMachineTable)
+    //    .crossJoin(sysMachineTable, `${sysMachineTable}.id`, '=', sysMachineId);
+    //    .cross
+
+    console.log("returning", newUserMachine);
+    return newUserMachine;
+}

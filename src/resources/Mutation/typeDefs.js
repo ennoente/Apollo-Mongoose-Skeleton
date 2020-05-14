@@ -2,10 +2,10 @@ import { gql } from 'apollo-server';
 
 export default gql `
   type Mutation {
-      createUser(email: String!, password: String!): User
+      createUser(username: String!, password: String!): ID
       
-      createUserMachine(input: UserMachineInput!): UserMachine
+      createUserMachine(input: UserMachineInput!): ID
 
-      createUserRoom(input: CreateUserRoomInput): UserRoom
+      createUserRoom(input: CreateUserRoomInput): ID
   }
 `;

@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 export default gql `
   type UserMachine {
-    _id: ID
+    id: ID
 
     description: String
     barcode: String
@@ -22,8 +22,8 @@ export default gql `
     serialNumber: String
     active: Boolean
 
-    roomId: String!
-    sysMachineId: String!
-    userId: String!
+    roomId: Int!
+    sysMachineId: Int!
+    userId: Int!
   }
 `;

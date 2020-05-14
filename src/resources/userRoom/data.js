@@ -1,6 +1,18 @@
-import { UserRoomModel } from "./model";
-import { UserModel } from "../user/model";
+import knex from '../../knex';
+import { getSQLTable } from '../../joinMasterUtil';
 
+
+export const createUserRoom = async(parent, { input }, ctx, info) => {
+    const userRoomTable = getSQLTable('UserRoom');
+    const { userId } = ctx.jwt;
+
+    const newRoom = await knex(userRoomTable)
+        .insert({...input, sys_user_id: userId });
+
+    console.log("newRoom", newRoom.id);
+}
+
+/*
 export const userRoomBatchingFunc = async(ids) => {
     try {
         const rooms = await UserRoomModel.find({
@@ -49,3 +61,4 @@ const transform = (roomObj) => {
         ...roomObj._doc,
     };
 };
+*/

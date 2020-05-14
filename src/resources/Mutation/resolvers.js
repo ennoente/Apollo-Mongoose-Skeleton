@@ -1,22 +1,16 @@
-import { withAuth } from "../util";
-
+import {withAuth, genericQueryResolver, genericCreateResolver} from "../util";
 import { createUser } from "../user/data";
-import { createUserMachine } from "../userMachine/data";
-import { createUserRoom } from "../userRoom/data";
+import { createUserMachine } from '../userMachine/data';
+import { createUserRoom } from '../userRoom/data';
 
 
 export default {
     Mutation: {
-        createUser: async(parent, args, ctx) => await createUser(args),
-        createUserMachine: async(parent, args, ctx) => {
-            return await withAuth(ctx.jwt, ctx.user, "write:usermachines", async() => {
-                return await createUserMachine(ctx, args.input);
-            })
+        createUser: async(parent, args, ctx, info) => {
+            await createUser(args);
+            return genericQueryResolver(parent, args, ctx, info);
         },
-
-        createUserRoom: async(parent, args, ctx) =>
-            await withAuth(ctx.jwt, ctx.user, "write:userrooms", async() => {
-                return await createUserRoom(args.input);
-            })
-    },
+        createUserRoom: genericCreateResolver,
+        createUserMachine: genericCreateResolver
+    }
 };

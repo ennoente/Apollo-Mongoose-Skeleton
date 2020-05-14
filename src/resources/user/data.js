@@ -1,47 +1,60 @@
-import { UserModel } from "./model";
-import { genericCreateResolver } from "../util";
 import bcrypt from 'bcrypt';
 import jwtLib from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server';
-
-
-
-export const fetchUserByJWT = async(jwt, { userMachineLoader, userRoomLoader }) => {
-    const { userId } = jwt;
-
-    const user = await UserModel.findOne({
-        _id: userId
-    });
-
-    if (!user) return null;
-    return transform(user, userMachineLoader, userRoomLoader);
-};
+import knex from '../../knex';
+import { getSQLTable } from '../../joinMasterUtil';
 
 
 
 export const createUser = async(args) => {
-    const { email, password } = args;
-
+    const { username, password } = args;
+    const sqlTable = getSQLTable('User');
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    return await genericCreateResolver(UserModel, { email: email, password: hashedPassword },
-        (newUser) => transform(newUser));
+    // First element
+    try {
+        const [newUser] = await knex(sqlTable)
+            .insert({
+                username: username,
+                password: hashedPassword
+            });
+
+        return newUser.id
+    } catch (e) {
+        // MySQL error code - duplicate entry on unique field (username in this case)
+        if (e.errno === 1062) {
+            throw new Error('User already exists');
+        }
+
+        throw new Error(e);
+    }
 };
 
 
 export const login = async(args) => {
-    const { email, password } = args;
+    const { username, password } = args;
 
-    const user = await UserModel.findOne({ email: email });
-    if (!user) return new AuthenticationError('No user found!');
+    const user = await knex("sys_user")
+        .select('id', 'username', 'email', 'password')
+        .where({ username: username })
+        .first();
+
+    if (!user)
+        return new AuthenticationError('Wrong username - no user found');
+
+    console.log("user.password", user.password);
+    console.log("typedPassword", password);
 
     const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) return new AuthenticationError('Password incorrect!');
+
+    if (!passwordMatches)
+        return new AuthenticationError('Incorrect password.');
 
     return await jwtLib.sign({
         userId: user.id,
-        email: user.email,
+        username: user.username,
+        email: user.email
     }, process.env.JWT_SECRET);
 };
 
