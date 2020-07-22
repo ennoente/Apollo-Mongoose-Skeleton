@@ -1,17 +1,17 @@
 import knex from "./knex";
-import {getTableAlias, knexToWhereClause} from "./joinMasterUtil";
 import SQLString from "sqlstring";
-import assert from "assert";
 
 export default {
     Mutation: {
         fields: {
-            deleteUserRoom: {
-                refType: 'UserRoom',
-                authorization: ( { input }, ctx) => ({
-                    
-                })
-            },
+            //deleteUserRoom: {
+            //    refType: 'UserRoom',
+            //    authorization: ( { input }, ctx) => ({
+            //        
+            //    })
+            //},
+
+            /*
             createUserRoom: {
                 refType: 'UserRoom',
                 fieldMappings: {
@@ -24,6 +24,9 @@ export default {
                     }
                 })
             },
+            */
+
+            /*
             createUserMachine: {
                 refType: 'UserMachine',
                 fieldMappings: {
@@ -46,22 +49,21 @@ export default {
                     }
                 }),
             },
+            */
         },
     },
     Query: {
         fields: {
+            /*
             me: {
                 where: (userTable, args, ctx) => {
                     const {jwt} = ctx;
                     return `${userTable}.id = ${jwt.userId}`;
                 },
             },
-            sysMachine: {
-                where: (sysMachineTable, args, ctx, sqlASTNode) => {
-                    const {id} = args;
-                    return `${sysMachineTable}.id = ${id}`;
-                },
-            },
+            */
+
+            /*
             allSysMachines: {
                 where: (sysMachineTable, args, ctx, sqlASTNode) => {
                     const query = knex.queryBuilder();
@@ -105,8 +107,10 @@ export default {
                     return sql;
                 },
             },
+            */
         },
     },
+    /*
     SysMachine: {
         sqlTable: "sys_machine",
         uniqueKey: "id",
@@ -116,14 +120,18 @@ export default {
             },
             manufacturer: {
                 sqlJoin: (sysMachineTable, sysManufacturerTable) =>
-                    `${sysMachineTable}.sys_hersteller_id = ${sysManufacturerTable}.id`,
+                    //`${sysMachineTable}.sys_hersteller_id = ${sysManufacturerTable}.id`,
+                    `${sysMachineTable}.sys_manufacturer_id = ${sysManufacturerTable}.id`,
             },
             group: {
                 sqlJoin: (sysMachineTable, sysGroupTable) =>
                     `${sysMachineTable}.sys_gruppe_id = ${sysGroupTable}.id`,
             },
-        },
+        }
     },
+    */
+
+    /*
     SysManufacturer: {
         sqlTable: "sys_manufacturer",
         uniqueKey: "id",
@@ -136,6 +144,9 @@ export default {
             },
         },
     },
+    */
+
+    /*
     SysGroup: {
         sqlTable: "sys_group",
         uniqueKey: "id",
@@ -146,8 +157,11 @@ export default {
             description: {
                 sqlColumn: "beschreibung",
             },
-        },
+        }
     },
+    */
+
+    /*
     User: {
         sqlTable: "sys_user",
         uniqueKey: "id",
@@ -165,9 +179,12 @@ export default {
             rooms: {
                 sqlJoin: (userTable, userRoomTable) =>
                     `${userTable}.id = ${userRoomTable}.sys_user_id`,
-            },
-        },
+            }
+        }
     },
+    */
+
+    /*
     UserMachine: {
         sqlTable: "user_machine",
         uniqueKey: "id",
@@ -178,8 +195,11 @@ export default {
             room: {
                 sqlJoin: (userMachineTable, userRoomTable) => `${userMachineTable}.user_room_id = ${userRoomTable}.id`
             }
-        },
+        }
     },
+    */
+
+    /*
     UserRoom: {
         sqlTable: "user_room",
         uniqueKey: "id",
@@ -189,7 +209,8 @@ export default {
             },
             description: {
                 sqlColumn: "description",
-            },
-        },
-    },
+            }
+        }
+    }
+    */
 };

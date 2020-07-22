@@ -11,11 +11,11 @@ export default gql `
     active: Boolean
 
     room: UserRoom
-    sysMachine: SysMachine!
-    user: User!
+    sysMachine(filter: FilterInput): SysMachine
+    user: User
   }
 
-  input UserMachineInput {
+  input UserMachineCreationInput {
     description: String
     barcode: String
     buildYear: Int
@@ -25,5 +25,16 @@ export default gql `
     roomId: Int!
     sysMachineId: Int!
     userId: Int!
+  }
+
+  input UserMachineUpdateInput {
+    description: String
+    barcode: String
+    buildYear: Int
+    serialNumber: String
+    active: Boolean
+
+    roomId: Int
+    sysMachineId: Int
   }
 `;

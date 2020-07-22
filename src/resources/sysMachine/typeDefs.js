@@ -8,7 +8,24 @@ export default gql `
       sysEdit: String
       sysUser: String
       
-      group: SysGroup
-      manufacturer: SysManufacturer
+      group(filter: FilterInput): SysGroup
+      manufacturer(filter: FilterInput): SysManufacturer
+      documents(filter: FilterInput): [Document]
+  }
+
+  input SysMachineCreationInput {
+    name: String!
+    description: String
+
+    groupId: Int!
+    manufacturerId: Int!
+  }
+
+  input SysMachineUpdateInput {
+    name: String
+    description: String
+
+    groupId: Int
+    manufacturerId: Int
   }
 `;

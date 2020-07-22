@@ -8,16 +8,21 @@ import { MutationTypeDefs, MutationResolvers } from "./Mutation";
 import { UserResolvers, UserTypeDefs } from "./user";
 import { UserMachineTypeDefs, UserMachineResolvers } from './userMachine';
 import { UserRoomTypeDefs } from './userRoom';
+import { UserMaintenanceTypeDefs } from './userMaintenance';
+import { DocumentTypeDefs } from './Document';
+
+//import { PrivateTypeDefs, PrivateResolvers } from './private';
 
 
-export const Resolvers = _.merge(
+export const PublicResolvers = _.merge(
     QueryResolvers,
     UserResolvers,
     MutationResolvers,
     UserMachineResolvers
 );
 
-export const TypeDefs = [
+//export const TypeDefs = [
+export const PublicTypeDefs = [
     MutationTypeDefs,
     QueryTypeDefs,
     SysMachineTypeDefs,
@@ -25,5 +30,9 @@ export const TypeDefs = [
     SysManufacturerTypeDefs,
     UserTypeDefs,
     UserMachineTypeDefs,
-    UserRoomTypeDefs
+    UserRoomTypeDefs,
+    UserMaintenanceTypeDefs,
+    DocumentTypeDefs,
 ];
+
+//export const PrivateTypeDefs;

@@ -1,6 +1,7 @@
 import { login } from "../user/data";
 
 import { genericQueryResolver } from "../util";
+import { random } from "lodash";
 
 export default {
     Query: {
@@ -8,6 +9,9 @@ export default {
 
         sysMachine: genericQueryResolver,
         allSysMachines: genericQueryResolver,
+
+        allUserMaintenances: genericQueryResolver,
+        dueUserMaintenances: genericQueryResolver,
 
         login: async(parent, args) => {
             return await login(args);

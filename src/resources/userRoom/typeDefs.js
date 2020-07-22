@@ -7,9 +7,14 @@ export default gql `
         description: String
     }
 
-    input CreateUserRoomInput {
+    input UserRoomCreationInput {
         name: String!
         description: String
         userId: Int!
+    }
+
+    input UserRoomUpdateInput {
+        name: String
+        description: String
     }
 `;

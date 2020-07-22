@@ -2,26 +2,55 @@
 import { ApolloServer, makeExecutableSchema } from 'apollo-server';
 import jwtLib from 'jsonwebtoken';
 
-import { Resolvers, TypeDefs } from './resources';
+import { merge } from 'lodash';
 
-import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
-//import joinMonsterAdapt from '../lib/join-monster-graphql-tools-adapter/src/index';
+import { PublicResolvers, PublicTypeDefs } from './resources';
+import { PrivateTypeDefs, PrivateResolvers } from './resources/private';
+
+//import joinMonsterAdapt from 'join-monster-graphql-tools-adapter';
+import joinMonsterAdapt from '../lib/join-monster-graphql-tools-adapter/src/index';
+
 import joinMonsterMetadata from './joinMonsterMetadata';
 
-const schema = makeExecutableSchema({
-    typeDefs: TypeDefs,
-    resolvers: Resolvers
+import { combineMetadata } from 'join-monster-modularizer';
+
+const publicSchema = makeExecutableSchema({
+    typeDefs: PublicTypeDefs,
+    resolvers: PublicResolvers
 });
 
-joinMonsterAdapt(schema, joinMonsterMetadata);
+const completeSchema = makeExecutableSchema({
+    typeDefs: [ PrivateTypeDefs, ...PublicTypeDefs ],
+    resolvers: merge(PublicResolvers, PrivateResolvers)
+});
 
-export const GraphQLSchema = schema;
 
-console.log("schema", schema);
+
+//const combinedMetadata = combineMetadata('src/JoinMonsterMetadata');
+const [ combinedMetadataPublic, combinedMetadataPrivate ] = combineMetadata('src/JoinMonsterMetadata');
+
+//console.log('combinedMetadata', combinedMetadata);
+console.log('joinMonsterMetadata', joinMonsterMetadata);
+
+//joinMonsterAdapt(schema, combinedMetadata);
+joinMonsterAdapt(publicSchema, combinedMetadataPublic);
+
+//const completeSchema = { ...publicSchema };
+joinMonsterAdapt(completeSchema, combinedMetadataPublic);
+joinMonsterAdapt(completeSchema, combinedMetadataPrivate);
+
+//joinMonsterAdapt(schema, joinMonsterMetadata);
+
+export const GraphQLSchema = completeSchema;
+//export const GraphQLSchema = publicSchema;
+//export const CompleteGraphQLSchema = completeSchema;
+
+console.log("public schema", publicSchema);
+console.log("complete schema", completeSchema);
 
 const server = new ApolloServer({
     debug: true,
-    schema,
+    schema: publicSchema,
     context: async({ req }) => {
         const authHeader = req.get('Authorization');
         let token = null;
