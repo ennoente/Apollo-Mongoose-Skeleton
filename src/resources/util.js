@@ -22,7 +22,7 @@ const authorize = async (authorizationFunc, args, context) => {
     const authObj = authorizationFunc(args, context);
     const input = flatten(args);
 
-    console.log("Authorizing...", authObj);
+    //console.log("Authorizing...", authObj);
 
     if (!authObj) return;
 
@@ -102,7 +102,7 @@ const authorize = async (authorizationFunc, args, context) => {
 };
 
 const getSqlTableFromReferencedField = (authObj, mutationName, inputField) => {
-    console.log("inputField", inputField);
+    //console.log("inputField", inputField);
 
     const referencedType = authObj[inputField].refType;
     const sqlTable = idx(GraphQLSchema, _ => _._typeMap[referencedType]._typeConfig.sqlTable);
@@ -132,7 +132,7 @@ export const genericDeleteResolver = async (parent, args, ctx, info) => {
         .where({ id: id })
         .del();
 
-    console.log("results", results);
+    //console.log("results", results);
     return results;
 }
 
@@ -157,7 +157,6 @@ export const genericUpdateResolver = async (parent, args, ctx, info) => {
     let updateObj = {};
 
     if (updateObjFunction) {
-        console.log("UPDATE OBJ FUNCTION");
         updateObj = updateObjFunction(args, ctx, info);
     }
 
@@ -171,8 +170,6 @@ export const genericUpdateResolver = async (parent, args, ctx, info) => {
     else
         //updateObj = args.input ? args.input : args;
         Object.assign(updateObj, args.input ? args.input : args);
-
-    console.log("updateObj", updateObj);
 
     let results;
 
@@ -188,14 +185,7 @@ export const genericUpdateResolver = async (parent, args, ctx, info) => {
             .update(updateObj);
     }
 
-    // Update generically
-    /*
-    const results = await knex(referencedSqlTable)
-        .where({ id: id })
-        .update(updateObj);
-    */
-
-    console.log("results", results);
+    //console.log("results", results);
     return results;
 };
 
@@ -216,8 +206,8 @@ export const genericCreateResolver = async (parent, args, ctx, info, name, trans
     //const fieldMappings = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields[fieldName].fieldMappings);
     const authorizationFunction = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields[fieldName].authorization);
 
-    console.log("fieldMappings", fieldMappings);
-    console.log("auth function:", authorizationFunction);
+    //console.log("fieldMappings", fieldMappings);
+    //console.log("auth function:", authorizationFunction);
 
     if (authorizationFunction)
         await authorize(authorizationFunction, args, ctx);
@@ -236,9 +226,6 @@ export const genericCreateResolver = async (parent, args, ctx, info, name, trans
     let newResource;
 
     if (ctx.transactionObj) {
-        //newResource = await knex(referencedSqlTable)
-        //    .transacting(transactionObj)
-    console.log("TRANSACTION IN CREATE");
         newResource = await ctx.transactionObj(referencedSqlTable)
             .insert(insertionObj);
     } else {
@@ -256,7 +243,7 @@ export const genericCreateResolver = async (parent, args, ctx, info, name, trans
 export const customResolver = async (parent, args, ctx, info) => {
     const {fieldName} = info;
 
-    console.log("info", info);
+    //console.log("info", info);
 
     const referencedType = idx(info, _ => _.parentType._fields[fieldName].refType);
     assert(referencedType, `Referenced type ${fieldName} not found!`)
@@ -272,7 +259,7 @@ export const customResolver = async (parent, args, ctx, info) => {
     //const fieldMappings = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields[fieldName].fieldMappings);
     const authorizationFunction = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields[fieldName].authorization);
 
-    console.log("fieldMappings", fieldMappings);
+    //console.log("fieldMappings", fieldMappings);
 
     if (authorizationFunction)
         await authorize(authorizationFunction, args, ctx);
@@ -291,7 +278,7 @@ export const genericQueryResolver = async (parent, args, ctx, info, fieldName) =
     if (!fieldName)
         fieldName = info.fieldName;
 
-    console.log("info", info);
+    //console.log("info", info);
 
     //let referencedType = idx(info, _ => _.parentType._fields[fieldName].type);
     let referencedType = idx(GraphQLSchema, _ => _._queryType._fields[fieldName].type);
@@ -310,7 +297,7 @@ export const genericQueryResolver = async (parent, args, ctx, info, fieldName) =
     //const authorizationFunction = idx(GraphQLSchema, _ => _._typeMap.Mutation._fields[fieldName].authorization);
     const authorizationFunction = idx(GraphQLSchema, _ => _._queryType._fields[fieldName].authorization);
 
-    console.log("fieldMappings", fieldMappings);
+    //console.log("fieldMappings", fieldMappings);
 
     if (authorizationFunction)
         await authorize(authorizationFunction, args, ctx);
@@ -318,8 +305,8 @@ export const genericQueryResolver = async (parent, args, ctx, info, fieldName) =
     return joinMonster(info, ctx, async (_sql) => {
         //console.log("info", info);
         const sql = _sql;
-        console.log("sql");
-        console.log(sql);
+        //console.log("sql");
+        //console.log(sql);
         //console.log("info", info);
         const [results] = await knex.raw(sql);
 

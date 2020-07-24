@@ -6,7 +6,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "babel-watch -L .",
-        "babel-version": "babel --version"
+        "babel-version": "babel --version",
+        "babel-build": "babel src --ignore lib --out-dir build"
     },
     "keywords": [],
     "author": "",
